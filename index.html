@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【Q4OS】デフォルト起動OSの変更方法</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #818cf8;
+            --accent-hover: #6366f1;
+            --code-bg: #000000;
+            --border-color: #334155;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 95%;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent-color), #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            color: var(--accent-color);
+        }
+
+        h2::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background-color: var(--accent-color);
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .problem-box {
+            border-left: 4px solid var(--warning-color);
+            background-color: rgba(245, 158, 11, 0.1);
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Courier New', Courier, monospace;
+            background-color: var(--code-bg);
+            color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            margin: 15px 0;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            font-size: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 8px;
+        }
+
+        .badge-warn { background-color: var(--warning-color); color: #000; }
+        .badge-info { background-color: var(--accent-color); color: #fff; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>【Q4OS】デフォルト起動OSの変更方法</h1>
+            <p class="subtitle">exeインストーラーのデュアルブート環境設定</p>
+        </header>
+
+        <section>
+            <h2>導入：発生している問題</h2>
+            <div class="problem-box">
+                <span class="badge badge-warn">Issue</span>
+                Q4OSをexeインストーラーで導入し、Windowsとのデュアルブート構成にした際、<strong>GRUBメニューで常に「Windows Boot Manager」がデフォルトに選択されてしまう</strong>。
+            </div>
+            <p>通常、Linuxディストリビューションでは <code>update-grub</code> コマンドで設定を更新しますが、Q4OSのexeインストーラー環境ではこの操作だけでは設定が反映されません。</p>
+        </section>
+
+        <section>
+            <h2>原因の解説</h2>
+            <p>この問題の原因は、Q4OSのexeインストーラーが <strong>GRUB設定ファイル（grub.cfg）を標準とは異なるパスに生成していること</strong> にあります。</p>
+            <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>設定ファイル</th>
+                        <th>パス</th>
+                        <th>備考</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>標準的なパス</td>
+                        <td><code>/boot/grub/grub.cfg</code></td>
+                        <td><code>update-grub</code> が書き込む先</td>
+                    </tr>
+                    <tr>
+                        <td><strong>実際に使用されるパス</strong></td>
+                        <td><code>/boot/efi/EFI/DebianBoot/grub.cfg</code></td>
+                        <td><strong>UEFI起動時に参照される実体</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            <p>実体ファイルに <code>set default="1"</code>（Windows側）がハードコードされており、標準の更新コマンドではこのファイルが書き換えられないため、設定が固定されてしまいます。</p>
+        </section>
+
+        <section>
+            <h2>解決策：Q4OSをデフォルトにする</h2>
+            <p>以下のステップで、正しいパスに対して設定を書き込みます。</p>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <strong>GRUB基本設定ファイルの編集</strong>
+                <p><code>/etc/default/grub</code> を開き、<code>GRUB_DEFAULT</code> の値をQ4OSのメニュー名に変更します。</p>
+                <pre><code>sudo nano /etc/default/grub
+
+# 変更前
+GRUB_DEFAULT=0
+
+# 変更後 (メニュー名を正確に指定)
+GRUB_DEFAULT="Q4OS Andromeda Desktop"</code></pre>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <strong>実体ファイルへの書き出し</strong>
+                <p><code>update-grub</code> の代わりに、出力先を明示的に指定して設定を生成します。</p>
+                <pre><code>sudo grub-mkconfig -o /boot/efi/EFI/DebianBoot/grub.cfg</code></pre>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <strong>設定の確認</strong>
+                <p>ファイル内に正しいデフォルト設定が書き込まれたか確認します。</p>
+                <pre><code>sudo grep "set default" /boot/efi/EFI/DebianBoot/grub.cfg</code></pre>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <strong>再起動</strong>
+                <p>システムを再起動し、Q4OSがデフォルトで選択されていることを確認してください。</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>元に戻す方法（Windowsをデフォルトにする）</h2>
+            <p>再びWindowsを優先させたい場合は、同様の手順で設定値を変更します。</p>
+            <pre><code># 1. /etc/default/grub を編集 (メニュー名を正確に指定)
+GRUB_DEFAULT="Windows Boot Manager (on /dev/sda2)"
+
+# 2. 設定を実体ファイルに反映
+sudo grub-mkconfig -o /boot/efi/EFI/DebianBoot/grub.cfg
+
+# 3. 再起動</code></pre>
+        </section>
+
+        <section>
+            <h2>まとめと注意点</h2>
+            <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>重要ポイント</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>設定パス</strong></td>
+                        <td><code>/boot/efi/EFI/DebianBoot/grub.cfg</code> に <code>grub-mkconfig</code> で設定を反映させること</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NG操作</strong></td>
+                        <td>単なる <code>sudo update-grub</code> では解決しない</td>
+                    </tr>
+                    <tr>
+                        <td><strong>指定方法</strong></td>
+                        <td><code>GRUB_DEFAULT</code> にはメニュー名を正確に記述すること<br>（メニュー順が変わらなければ 0, 1, 2... などの番号指定でも動作します）</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <div class="footer">
+            Q4OS Configuration Technical Memo
+        </div>
+    </div>
+</body>
+</html>
